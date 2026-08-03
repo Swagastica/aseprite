@@ -8,6 +8,13 @@ jobs:
     - uses: actions/checkout@v7
       with:
         submodules: 'recursive'
+    
+    - name: Install Dependencies
+      shell: bash
+      run: |
+        choco install openssl -y
+        echo "C:\Program Files\OpenSSL-Win64\bin" >> $GITHUB_PATH
+        
     - name: Install Skia
       shell: bash
       run: |
@@ -16,10 +23,13 @@ jobs:
         skia_file=$(basename $skia_url)
         curl --ssl-revoke-best-effort -L -o "$skia_file" "$skia_url"
         unzip "$skia_file" -d skia
+        
     - uses: aseprite/get-ninja@main
+    
     - uses: TheMrMilchmann/setup-msvc-dev@v4
       with:
         arch: x64
+        
     - name: Generating Makefiles
       shell: bash
       run: |
@@ -35,15 +45,21 @@ jobs:
           -DENABLE_CCACHE=$enable_ccache \
           -DLAF_BACKEND=$laf_backend \
           -DSKIA_DIR=$(realpath skia) \
-          -DSKIA_LIBRARY_DIR=$(realpath skia/out/Release-$skia_arch)
+          -DSKIA_LIBRARY_DIR=$(realpath skia/out/Release-$skia_arch) \
+          -DOPENSSL_ROOT_DIR="C:/Program Files/OpenSSL-Win64" \
+          -DOPENSSL_USE_STATIC_LIBS=ON \
+          -DCMAKE_EXE_LINKER_FLAGS="/MT" \
+          -DBUILD_SHARED_LIBS=OFF
+          
     - name: Compiling
       shell: bash
       run: |
         cd build && ninja
+        
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: win-build
         path: |
-          build/bin/
-        if-no-files-found: warn
+          build/bin/aseprite.exe
+        if-no-files-found: fail
