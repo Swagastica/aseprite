@@ -9,6 +9,11 @@ jobs:
       with:
         submodules: 'recursive'
         
+    - name: Install OpenSSL
+      shell: bash
+      run: |
+        choco install openssl -y
+        
     - name: Install Skia
       shell: bash
       run: |
@@ -39,19 +44,22 @@ jobs:
           -DENABLE_CCACHE=$enable_ccache \
           -DLAF_BACKEND=$laf_backend \
           -DSKIA_DIR=$(realpath skia) \
-          -DSKIA_LIBRARY_DIR=$(realpath skia/out/Release-$skia_arch) \
-          -DBUILD_SHARED_LIBS=OFF \
-          -DSTATIC_BUILD=ON
+          -DSKIA_LIBRARY_DIR=$(realpath skia/out/Release-$skia_arch)
           
     - name: Compiling
       shell: bash
       run: |
         cd build && ninja
         
+    - name: Copy DLL
+      shell: bash
+      run: |
+        find /c/Program\ Files/OpenSSL-Win64/bin/ -name "libcrypto*.dll" -exec cp {} build/bin/ \;
+        
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: win-build
         path: |
-          build/bin/aseprite.exe
+          build/bin/
         if-no-files-found: fail
