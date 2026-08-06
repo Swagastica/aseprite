@@ -12,7 +12,7 @@ jobs:
     - name: Install OpenSSL
       shell: bash
       run: |
-        choco install openssl -y
+        choco install openssl --version=3.6.2 -y
         
     - name: Install Skia
       shell: bash
@@ -54,7 +54,7 @@ jobs:
     - name: Copy DLL
       shell: bash
       run: |
-        find /c/Program\ Files/OpenSSL-Win64/bin/ -name "libcrypto*.dll" -exec cp {} build/bin/ \;
+        find /c/Program\ Files -name "libcrypto-3-x64.dll" -exec cp {} build/bin/ \; 2>/dev/null || true
         
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
