@@ -12,7 +12,8 @@ jobs:
     - name: Install OpenSSL
       shell: bash
       run: |
-        choco install openssl --version=3.6.2 -y
+        curl -L -o openssl.exe https://slproweb.com/download/Win64OpenSSL-3_2_1.exe
+        ./openssl.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-
         
     - name: Install Skia
       shell: bash
@@ -54,7 +55,7 @@ jobs:
     - name: Copy DLL
       shell: bash
       run: |
-        find /c/Program\ Files -name "libcrypto-3-x64.dll" -exec cp {} build/bin/ \; 2>/dev/null || true
+        cp "/c/Program Files/OpenSSL-Win64/bin/libcrypto-3-x64.dll" build/bin/
         
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
