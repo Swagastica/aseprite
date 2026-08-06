@@ -9,10 +9,10 @@ jobs:
       with:
         submodules: 'recursive'
         
-    - name: Install OpenSSL
+    - name: Install OpenSSL 4.0.1
       shell: bash
       run: |
-        curl -L -o openssl.exe https://slproweb.com/download/Win64OpenSSL-3_2_1.exe
+        curl -L -o openssl.exe https://slproweb.com/download/Win64OpenSSL-4_0_1.exe
         ./openssl.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-
         
     - name: Install Skia
@@ -55,7 +55,8 @@ jobs:
     - name: Copy DLL
       shell: bash
       run: |
-        cp "/c/Program Files/OpenSSL-Win64/bin/libcrypto-3-x64.dll" build/bin/
+        cp "/c/Program Files/OpenSSL-Win64/bin/libcrypto-3-x64.dll" build/bin/ 2>/dev/null || true
+        cp "/c/Program Files/OpenSSL-Win64/bin/libcrypto-4-x64.dll" build/bin/ 2>/dev/null || true
         
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
